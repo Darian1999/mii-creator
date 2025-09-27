@@ -18,7 +18,7 @@ export default {
     download: "Download",
   },
   generic: {
-    app_title: "Mii Creator",
+    app_title: "Mii Creator (XiaojianMod)",
     camera: "Camera",
     useMouseOrTouch: "Use mouse or touch to move the camera.",
     pose: "Pose",

@@ -33,4 +33,6 @@ if (Config.apis.useSentry) {
 }
 
 langManager.getString("languages.en_US");
+import { applyGlossyButtonStyling } from "./ui/xiaojianmodspecifics";
+applyGlossyButtonStyling();
 setupUi();
