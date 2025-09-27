@@ -1,4 +1,5 @@
 import localforage from "localforage";
+import Modal from "../../ui/components/Modal";
 
 export const getMusicManager = () => mm;
 export class MusicManager {
@@ -52,26 +53,40 @@ export class MusicManager {
 
     console.error("initMusic()", theme, document.documentElement.dataset.theme);
 
-    if (theme === "wiiu") {
-      this.setVolume(0.65);
-      this.previousVolume = 0.65;
-      await this.loadSong(
-        "./assets/audio/ffl_app_menu.mp3",
-        "mii_creator_music"
-      );
-      await this.loadSong(
-        "./assets/audio/ffl_app_edit.mp3",
-        "mii_editor_music"
-      );
-      //@ts-expect-error
-      window.music = this;
-    } else {
+    // Bakushin easter egg
+    if (Math.random() < 0.0564) {
       this.setVolume(0.28);
       this.previousVolume = 0.28;
       await this.loadSong(
-        "./assets/audio/miimakermusic.mp3",
+        "./assets/audio/bakushinbakushinbakushinshin.mp3",
         "mii_creator_music"
       );
+      Modal.alert(
+        "Hey!",
+        "I've hijacked the Mii Creator! Now it's gonna play my special music! Everyone's gonna BAKUSHIN with their Miis - that's an honor student's promise! BAKUSHIIIIIIN!\n\n- Sakura Bakushin O, Class Representative and World's Fastest Uma Musume"
+      );
+    } else {
+      if (theme === "wiiu") {
+        this.setVolume(0.65);
+        this.previousVolume = 0.65;
+        await this.loadSong(
+          "./assets/audio/ffl_app_menu.mp3",
+          "mii_creator_music"
+        );
+        await this.loadSong(
+          "./assets/audio/ffl_app_edit.mp3",
+          "mii_editor_music"
+        );
+        //@ts-expect-error
+        window.music = this;
+      } else {
+        this.setVolume(0.28);
+        this.previousVolume = 0.28;
+        await this.loadSong(
+          "./assets/audio/miimakermusic.mp3",
+          "mii_creator_music"
+        );
+      }
     }
 
     this.initMusicReady();

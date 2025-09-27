@@ -469,6 +469,49 @@ export async function Library(highlightMiiId?: string) {
                   "Helped with design and created the Wii U theme",
                   "0800450308040402020c0308060406020a0001000006000804000a0800326702010314031304190d04000a040109"
                 );
+                const crimsonJumpscare = createMiiCard(
+                  container,
+                  "????????",
+                  "????????",
+                  "https://wiisports.fandom.com/wiki/Xiaojian",
+                  "I hope no-one will see my trick! - Xiaojian from WSC/WPU",
+                  "AwFEMAlEvOEX1SrIlW7rwAQD1gVcCAAAAAy3MOMwqjC4MKgw8zAAAAAAAAAAAABAMyBxACBoRBwCBEYYZBQRZg0AACkAUkhQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMZe"
+                );
+
+                crimsonJumpscare?.on("click", () => {
+                  const overlay = new Html("div").style({
+                    position: "fixed",
+                    top: "0",
+                    left: "0",
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                    zIndex: "9999",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }).appendTo("body");
+
+                  const jumpscareImage = new Html("img").attr({
+                    src: "/assets/images/crimson_jumpscare.png",
+                  }).style({
+                    transform: "scale(0)",
+                    transition: "transform 0.2s ease-in-out",
+                  }).appendTo(overlay);
+
+                  const audio = new Audio("/assets/audio/bakushinbakushinbakushinshin.mp3");
+                  audio.play();
+
+                  setTimeout(() => {
+                    jumpscareImage.style({
+                      transform: "scale(1)",
+                    });
+                  }, 100);
+
+                  overlay.on("click", () => {
+                    overlay.cleanup();
+                  });
+                });
               })
               .style({ flex: "1" })
           ),

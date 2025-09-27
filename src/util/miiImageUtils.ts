@@ -271,7 +271,7 @@ export function createMiiCard(
   studioData: string,
   extra: string = ""
 ) {
-  new Html("div")
+  return new Html("div")
     .class("flex-group")
     .style({
       gap: "0",
