@@ -107,6 +107,51 @@ export const updateSettings = async (force: boolean = false) => {
         }
       });
   }
+
+  // Background handling
+  const backgroundType = await getSetting("backgroundType");
+  const htmlElement = document.documentElement;
+  const bodyElement = document.body;
+  
+  // Remove all background-related classes/styles first from both html and body
+  htmlElement.style.removeProperty("background-image");
+  htmlElement.style.removeProperty("background-color");
+  htmlElement.style.removeProperty("background-size");
+  htmlElement.style.removeProperty("background-position");
+  htmlElement.style.removeProperty("background-repeat");
+  bodyElement.style.removeProperty("background-image");
+  bodyElement.style.removeProperty("background-color");
+  bodyElement.style.removeProperty("background-size");
+  bodyElement.style.removeProperty("background-position");
+  bodyElement.style.removeProperty("background-repeat");
+  
+  switch (backgroundType) {
+    case "default":
+      // Let the CSS handle the default background
+      break;
+    case "color":
+      const backgroundColor = await getSetting("backgroundColor");
+      htmlElement.style.backgroundColor = backgroundColor;
+      bodyElement.style.backgroundColor = backgroundColor;
+      break;
+    case "image":
+      const backgroundImageData = await localforage.getItem("settings_backgroundImageData");
+      if (backgroundImageData) {
+        const bgImageValue = `url('${backgroundImageData}')`;
+        htmlElement.style.backgroundImage = bgImageValue;
+        bodyElement.style.backgroundImage = bgImageValue;
+        htmlElement.style.backgroundSize = "cover";
+        bodyElement.style.backgroundSize = "cover";
+        htmlElement.style.backgroundPosition = "center";
+        bodyElement.style.backgroundPosition = "center";
+        htmlElement.style.backgroundRepeat = "no-repeat";
+        bodyElement.style.backgroundRepeat = "no-repeat";
+      } else {
+        // Fallback to default if image not set
+        break;
+      }
+      break;
+  }
 };
 
 let prevSetting: Record<string, any> = {};
@@ -230,6 +275,69 @@ export const settingsInfo: Record<string, any> = {
       { label: "Custom", value: "custom", isColor: true },
     ],
   },
+  backgroundType: {
+    type: "multi",
+    label: "Background Type",
+    default: "default",
+    description: "Choose the type of background for the application.",
+    choices: [
+      { label: "Default", value: "default" },
+      { label: "Solid Color", value: "color" },
+      { label: "Image", value: "image" },
+    ],
+  },
+  backgroundColor: {
+    type: "multi",
+    label: "Background Color",
+    default: "#ffffff",
+    condition: (settings: any) => settings.backgroundType === "color",
+    description: "Select a solid color for the background.",
+    choices: [
+      { label: "White", value: "#ffffff" },
+      { label: "Black", value: "#000000" },
+      { label: "Light Gray", value: "#f0f0f0" },
+      { label: "Dark Gray", value: "#333333" },
+      { label: "Custom", value: "custom", isColor: true },
+    ],
+  },
+  backgroundImage: {
+    type: "non-settings-multi",
+    label: "Background Image",
+    condition: (settings: any) => settings.backgroundType === "image",
+    description: "Upload a custom background image for the application.",
+    choices: [
+      {
+        label: "Upload Image",
+        async select() {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+              const result = event.target?.result as string;
+              if (result) {
+                await localforage.setItem("settings_backgroundImageData", result);
+                updateSettings();
+              }
+            };
+            reader.readAsDataURL(file);
+          };
+          input.click();
+        },
+      },
+      {
+        label: "Reset Background",
+        async select() {
+          await localforage.removeItem("settings_backgroundImageData");
+          updateSettings();
+        },
+      },
+    ],
+  },
   saveData: {
     type: "non-settings-multi",
     label: "Save Data",
@@ -331,6 +439,9 @@ for (const key in settingsInfo) {
   let prefixedKey = prefix + key;
   prevSetting[key] = await localforage.getItem(prefixedKey);
 }
+
+// Also track background image data separately
+prevSetting["backgroundImageData"] = await localforage.getItem("settings_backgroundImageData");
 
 export async function Settings() {
   const modal = Modal.modal("Settings", "", "body", {

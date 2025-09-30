@@ -43,6 +43,10 @@
         console.log("Mii result:", result);
         showResult(result);
       });
+
+      document.getElementById("testTrig").addEventListener("click", async () => {
+        console.log(MiiCreator.trig.fastSin(0.5));
+      });
     </script>
 
     <div id="template" style="display: none">
@@ -53,5 +57,6 @@
     <button id="createNew">New Mii</button>
     <button id="editExisting">Edit Existing Mii</button>
     <button id="select">Select Existing Mii from your library</button>
+    <button id="testTrig">Test Trig</button>
   </body>
 </html>

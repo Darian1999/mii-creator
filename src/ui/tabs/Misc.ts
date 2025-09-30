@@ -4,6 +4,8 @@ import { Buffer as Buf } from "../../../node_modules/buffer/index";
 import { Input } from "../components/Input";
 import Mii from "../../external/mii-js/mii";
 import { RenderPart } from "../../class/MiiEditor";
+import Modal from "../components/Modal";
+import localforage from "localforage";
 
 export function MiscTab(data: TabRenderInit) {
   let tmpMii = new Mii(data.mii.encode());
@@ -25,7 +27,40 @@ export function MiscTab(data: TabRenderInit) {
           "Name",
           data.mii.miiName,
           // set
-          (name) => setProp("miiName", name.trim()),
+          (name) => {
+            if (name.trim() === "Super Creek") {
+              Modal.modal(
+                "Super Creek",
+                "Have you played Goo-Goo Babies with YOUR LIFE ON THE LINE?!",
+                "body",
+                {
+                  text: "Yes",
+                  callback: () => {
+                    location.reload();
+                  },
+                },
+                {
+                  text: "No",
+                  callback: async () => {
+                    await localforage.clear();
+                    location.reload();
+                  },
+                }
+              );
+              return true;
+            }
+            const nameBuffer = Buf.from(name, "utf16le");
+
+            // Empty string check
+            let nameStr = nameBuffer.toString("utf16le");
+            if (nameStr.trim() === "") return false;
+
+            // Name length check
+            if (nameBuffer.length <= 0x14 && nameBuffer.length !== 0)
+              return true;
+
+            return false;
+          },
           // validate
           (name) => {
             const nameBuffer = Buf.from(name, "utf16le");
@@ -35,7 +70,7 @@ export function MiscTab(data: TabRenderInit) {
             if (nameStr.trim() === "") return false;
 
             // Name length check
-            if (nameBuffer.length <= 0x14 && nameBuffer.length !== 0)
+            if (nameBuffer.length <= 0x3f && nameBuffer.length !== 0)
               return true;
 
             return false;

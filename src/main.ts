@@ -6,6 +6,7 @@ import LazyLoad, { type ILazyLoadInstance } from "vanilla-lazyload";
 import { langManager } from "./l10n/manager";
 import * as Sentry from "@sentry/browser";
 import { Config } from "./config";
+import * as trig from "./util/fast-trig";
 
 declare global {
   interface Window {

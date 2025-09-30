@@ -1,3 +1,4 @@
+import * as trig from "./util/fast-trig";
 function makeFrame(params: string, fullscreen: boolean) {
   const frame = document.createElement("iframe");
   if (fullscreen) {
@@ -15,8 +16,10 @@ function makeFrame(params: string, fullscreen: boolean) {
   return frame;
 }
 
+import * as trig from "./util/fast-trig";
 // UNFINISHED, DO NOT USE YET
 export default {
+  trig: trig,
   configuration: {
     music: true,
   },

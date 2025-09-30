@@ -54,12 +54,12 @@ export const Config = {
     // ^^ scaleLimit, scaleLimitClampY, scaleApply
   },
   version: {
-    string: "v0.9.3.1",
+    string: "v0.9.3.1, XiaojianMod v0.1 BETA (Sanatorne)",
     name: "Patch Update",
 
     // ignore that I'm just writing HTML here
     changelog: `
-    <h1 style="font-size: 20px;text-align: center;">v0.9.2 - QR Code and MiiC v3 Support</h1>
+    <h1 style="font-size: 20px;text-align: center;">v0.9.3.1 - XiaojianMod Features Added</h1>
 
     <div class="flex-group">
       <img draggable="false" width=96 height=96 src="https://i.imgur.com/sMtNF5a.png">
@@ -73,6 +73,14 @@ export const Config = {
       <p style="margin-bottom:0"><strong style="color:var(--error-color)">Please <a target="_blank" href="mailto:datkat21.yt@gmail.com">contact me</a> <small>(kat21)</small> if you have any feedback, feature requests, or bug reports.</strong></p>
       <small>(Some people are just not aware that kat21 made this app, not ariankordi. if you are one of those people you should know by now. Also this project is named "Mii Creator", not "Mii Creator Web," or any other "mii maker" thing. 🙂)</small>
     </div>
+    
+    <h3>NEW: XiaojianMod Features Added</h3>
+    <ul style="display:flex;flex-direction:column;gap:8px;line-height:1.75rem">
+      <li style="color:var(--gold-color)">Easter eggs added: Bakushin and Super Creek easter eggs!</li>
+      <li>Custom background options expanded with additional themed backgrounds</li>
+      <li>Special color palettes and themed UI elements for different modes</li>
+      <li>Additional secret features and easter eggs to discover......</li>
+    </ul>
     
     <h3>NEW: v0.9.3.1 - Extremely Small Patch Update</h3>
     <ul style="display:flex;flex-direction:column;gap:8px;line-height:1.75rem">
