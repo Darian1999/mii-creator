@@ -49,7 +49,7 @@ export function QrScannerError(message: string) {
 function hexToUint8Array(hex: string) {
   const bytes = new Uint8Array(hex.length / 2);
   for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = parseInt(hex.substring(i * 2, 2), 16);
+    bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16); // Correct: use end position
   }
   return bytes;
 }
@@ -78,22 +78,23 @@ function isHex(str: string) {
 
 // Helper function to check if a string is valid base64
 function isBase64(str: string) {
+  if (str === '' || str.trim() === '') return false;
   try {
-    atob(str); // `atob` will throw an error if the string is not valid base64
-    return true;
+    return btoa(atob(str)) === str;
   } catch (e) {
     return false;
   }
 }
 
 // CRC16 and CRC32 utilities
-function crc16(data: Uint8Array<ArrayBuffer>) {
+function crc16(data: Uint8Array) {
   let crc = 0xffff;
   for (let byte of data) {
     crc ^= byte << 8;
     for (let i = 0; i < 8; i++) {
       crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
     }
+    crc &= 0xffff; // Ensure 16-bit after each byte to prevent overflow
   }
   return crc & 0xffff;
 }
@@ -123,7 +124,7 @@ function generateCrc32CksumTable() {
 generateCrc32CksumTable();
 
 // CRC-32/CKSUM function
-function crc32(input: string | any[] | Uint8Array<ArrayBuffer>) {
+function crc32(input: Uint8Array) {
   let crc = 0x00000000; // Initial value for CRC-32/CKSUM
   for (let i = 0; i < input.length; i++) {
     const byte = (input[i] ^ (crc >>> 24)) & 0xff;
@@ -134,7 +135,7 @@ function crc32(input: string | any[] | Uint8Array<ArrayBuffer>) {
 
 // AES-CCM Decryption (using private ctrMode function)
 function decryptAesCcm(
-  encryptedData: string | any[] | Uint8Array<ArrayBuffer>
+  encryptedData: Uint8Array
 ) {
   if (encryptedData.length < 112) {
     throw new Error(
@@ -172,8 +173,8 @@ function decryptAesCcm(
 
 // AES-CTR Decryption (for extra data)
 async function decryptAesCtr(
-  encryptedData: Uint8Array<ArrayBuffer>,
-  iv: Uint8Array<ArrayBuffer>
+  encryptedData: Uint8Array,
+  iv: Uint8Array
 ) {
   // Calls to SubtleCr*pto (window.cr*pto.subtle):
   const key = await sc.importKey(
@@ -183,15 +184,16 @@ async function decryptAesCtr(
     false,
     ["decrypt"]
   );
+  // Fixed: Use the actual slice of the buffer to avoid including extra bytes
   const decrypted = await sc.decrypt(
     { name: "AES-CTR", counter: iv, length: 128 },
     key,
-    encryptedData.buffer
+    encryptedData.buffer.slice(encryptedData.byteOffset, encryptedData.byteOffset + encryptedData.byteLength)
   );
   return new Uint8Array(decrypted);
 }
 
-function extractUTF16LEText(data: string | any[], startOffset: number) {
+function extractUTF16LEText(data: Uint8Array, startOffset: number) {
   const length = 20;
   let endPosition = startOffset;
 
@@ -208,7 +210,7 @@ function extractUTF16LEText(data: string | any[], startOffset: number) {
 
   // Extract and decode the name bytes
   const nameBytes = data.slice(startOffset, endPosition);
-  return decoder.decode(nameBytes as any);
+  return decoder.decode(nameBytes);
 }
 function getNameFromCFSD(data: any) {
   return extractUTF16LEText(data, 0x1a);
@@ -225,7 +227,7 @@ function getFormattedTime() {
   ).padStart(2, "0")}`;
 }
 
-function getExtraDataGenericName(data: string | any[]) {
+function getExtraDataGenericName(data: Uint8Array) {
   switch (data.length) {
     case 40:
       return "miitomo-data";
